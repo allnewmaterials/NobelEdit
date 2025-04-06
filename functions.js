@@ -16,7 +16,10 @@ let filterIntensity ={
     green: 1,
     blue: 1,
     boxBlurRadius: 0,
-    gaussBlurRadius: 0
+    gaussBlurRadius: 0,
+    sobel: 0,
+    laplacian: 0
+
 };
 
 let archive = [];
@@ -92,6 +95,12 @@ function applyFilters(){
     if(filterIntensity.gaussBlurRadius > 0)
         processedImageData = gaussianBlur(processedImageData);
 
+    if(filterIntensity.sobel == 1)
+        processedImageData = sobelFilter(processedImageData);
+
+    if(filterIntensity.laplacian == 1)
+        processedImageData = laplacianFilter(processedImageData);
+
     context.putImageData(processedImageData, 0, 0);
 }
 
@@ -115,8 +124,17 @@ function resetFilters(){
     filterIntensity.red = 1;
     filterIntensity.green = 1;
     filterIntensity.blue = 1;
+    filterIntensity.sobel = 0;
+    filterIntensity.laplacian;
 
     applyFilters();
+}
+
+function saveImage(){
+    let link =  document.createElement('a');
+    link.download = 'krejzi_image.png';
+    link.href = document.getElementById('editor-canvas').toDataURL();
+    link.click();
 }
 
 document.getElementById('grayscale-slider').addEventListener('input', (e) => {
@@ -159,6 +177,19 @@ document.getElementById('blue-slider').addEventListener('input', (e) => {
     applyFilters();
 });
 
+document.getElementById('sobel-operator').addEventListener('click',() => {
+    if(filterIntensity.sobel == 0)
+        filterIntensity.sobel = 1;
+    else filterIntensity.sobel = 0;
+    applyFilters();
+});
+
+document.getElementById('laplacian-operator').addEventListener('click',() => {
+    if(filterIntensity.laplacian == 0)
+        filterIntensity.laplacian = 1;
+    else filterIntensity.laplacian = 0;
+    applyFilters();
+});
 
 /********** 
  * FILTER FUNCTIONS
@@ -200,7 +231,6 @@ function changeThreshold(imageData) {
       const g = src[i+1];
       const b = src[i+2];
       
-      // thresholding the current value
       const v = (0.2126*r + 0.7152*g + 0.0722*b >= filterIntensity.threshold) ? 255 : 0;
       
       src[i] = src[i+1] = src[i+2] = v;
@@ -273,10 +303,8 @@ function gaussianBlur(imageData) {
     const width = imageData.width;
     const height = imageData.height;
     
-    // Generate Gaussian kernel
     const kernel = generateGaussianKernel();
     
-    // Apply separable Gaussian blur (horizontal then vertical)
     const tempData = horizontalPass(src, width, height, kernel);
     const resultData = verticalPass(tempData, width, height, kernel);
     
@@ -284,18 +312,17 @@ function gaussianBlur(imageData) {
 }
 
 function generateGaussianKernel() {
-    const sigma = filterIntensity.gaussBlurRadius / 3; // Standard deviation
+    const sigma = filterIntensity.gaussBlurRadius / 3;
     const kernel = [];
     let sum = 0;
     
-    // Create kernel values
+    
     for (let i = -filterIntensity.gaussBlurRadius; i <= filterIntensity.gaussBlurRadius; i++) {
         const value = Math.exp(-(i*i) / (2 * sigma * sigma));
         kernel.push(value);
         sum += value;
     }
     
-    // Normalize kernel
     return kernel.map(v => v / sum);
 }
 
@@ -377,10 +404,124 @@ function changeRGB(imageData){
     return imageData;
 }
 
-function saveImage(){
-    let link =  document.createElement('a');
-    link.download = 'krejzi_image.png';
-    link.href = document.getElementById('editor-canvas').toDataURL();
-    link.click();
+function sobelFilter(imageData) {
+    const width = imageData.width;
+    const height = imageData.height;
+    const src = imageData.data;
+    let output = new Uint8ClampedArray(src.length);
+
+    const Gx = [
+        [-1, 0, 1],
+        [-2, 0, 2],
+        [-1, 0, 1]
+    ];
+    const Gy = [
+        [-1, -2, -1],
+        [0, 0, 0],
+        [1, 2, 1]
+    ];
+
+    const maxMagnitude = Math.sqrt(1020 * 1020 + 1020 * 1020);
+
+    for (let y = 1; y < height - 1; y++) {
+        for (let x = 1; x < width - 1; x++) {
+            let GxSum = 0;
+            let GySum = 0;
+
+            for (let ky = -1; ky <= 1; ky++) {
+                for (let kx = -1; kx <= 1; kx++) {
+                    let neighborX = x + kx;
+                    let neighborY = y + ky;
+                    let index = (neighborY * width + neighborX) * 4;
+
+                    let red = src[index];
+                    let green = src[index + 1];
+                    let blue = src[index + 2];
+
+                    let pixelValue = 0.299 * red + 0.587 * green + 0.114 * blue;
+
+                    GxSum += pixelValue * Gx[ky + 1][kx + 1];
+                    GySum += pixelValue * Gy[ky + 1][kx + 1];
+                }
+            }
+
+            let magnitude = Math.sqrt(GxSum * GxSum + GySum * GySum);
+            let normalizedMagnitude = (magnitude / maxMagnitude) * 255;
+            normalizedMagnitude = Math.min(255, Math.max(0, normalizedMagnitude));
+
+            const outputIndex = (y * width + x) * 4;
+
+            output[outputIndex] = normalizedMagnitude;
+            output[outputIndex + 1] = normalizedMagnitude;
+            output[outputIndex + 2] = normalizedMagnitude;
+            output[outputIndex + 3] = 255;
+        }
+    }
+
+    return new ImageData(output, width, height);
 }
 
+function laplacianFilter(imageData){
+    const width = imageData.width;
+    const height = imageData.height;
+    const src = imageData.data;
+    let output = new Uint8ClampedArray(src.length);
+
+    const kernel = [
+        [0, -1, 0],
+        [-1, 4, -1],
+        [0, -1, 0]
+    ];
+
+    const maxMagnitude = 1020;
+
+    for (let y = 1; y < height - 1; y++) {
+        for (let x = 1; x < width - 1; x++) {
+            let sum = 0;
+
+            for (let ky = -1; ky <= 1; ky++) {
+                for (let kx = -1; kx <= 1; kx++) {
+                    let neighborX = x + kx;
+                    let neighborY = y + ky;
+                    let index = (neighborY * width + neighborX) * 4;
+                    
+                    let red = src[index];
+                    let green = src[index + 1];
+                    let blue = src[index + 2];
+
+                    let pixelValue = 0.299 * red + 0.587 * green + 0.114 * blue;
+
+                    sum += kernel[kx + 1][ky + 1] * pixelValue;
+                }
+            }
+            let magnitude = Math.abs(sum);
+            let normalizedMagnitude = (magnitude / maxMagnitude) * 255;
+            normalizedMagnitude = Math.min(255, Math.max(0, normalizedMagnitude));
+
+            const outputIndex = (y * width + x) * 4;
+
+            output[outputIndex] = normalizedMagnitude; // Red channel
+            output[outputIndex + 1] = normalizedMagnitude; // Green channel
+            output[outputIndex + 2] = normalizedMagnitude; // Blue channel
+            output[outputIndex + 3] = 255; // Alpha channel
+        }
+    }
+    
+    return new ImageData(output, width, height);
+
+}
+
+function unsharpMask(imageData){
+
+}
+
+function undo() {
+    if (archive.length > 0) {
+        context.putImageData(archive.pop(), 0, 0);
+    } else {
+        alert('No more undos available!');
+    }
+}
+function saveImageToArchive() {
+    archive.push(context.getImageData(0, 0, canvas.width, canvas.height));
+}
