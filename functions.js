@@ -1,199 +1,3 @@
-let canvas = document.getElementById('editor-canvas');
-let context = canvas.getContext('2d');
-
-let originalImage = new Image;
-let originalImageData = context.getImageData(0, 0, canvas.width, canvas.height);
-
-let brightnessSlider = document.getElementById('brightness-slider');
-let grayscaleSlider = document.getElementById('grayscale-slider');
-let thresholdSlider = document.getElementById('treshold-slider');
-
-let filterIntensity ={
-    grayscale: 0,
-    brightness: 0,
-    threshold: 0,
-    red: 1,
-    green: 1,
-    blue: 1,
-    boxBlurRadius: 0,
-    gaussBlurRadius: 0,
-    sobel: 0,
-    laplacian: 0
-
-};
-
-let archive = [];
-
-// Heigth in width za spreminjanje velikosti slike
-const maxWidth = 800;  
-const maxHeight = 600; 
-let displayWidth = canvas.width;
-let displayHeight = canvas.height;
-
-
-/********* 
- * CORE FUNCTIONALITY STUFF
- **********/ 
-
-function uploadImage(event) {
-
-    const img = new Image();
-    img.src = URL.createObjectURL(event.target.files[0]);
-
-    img.onload = function() {
-        
-        let width = img.width;
-        let height = img.height;
-
-        if (width > maxWidth) {
-            const ratio = maxWidth / width;
-            width = maxWidth;
-            height = height * ratio;
-        }
-
-        if (height > maxHeight) {
-            const ratio = maxHeight / height;
-            height = maxHeight;
-            width = width * ratio;
-        }
-
-        canvas.width = width;
-        displayWidth = width;
-        canvas.height = height;
-        displayHeight = height;
-
-        context.drawImage(img, 0, 0, width, height);
-        originalImageData = context.getImageData(0, 0, canvas.width, canvas.height);
-        originalImage = img;
-        
-        URL.revokeObjectURL(img.src);
-    };
-    applyFilters();
-};
-
-function applyFilters(){
-    let processedImageData = new ImageData(
-        new Uint8ClampedArray(originalImageData.data),
-        originalImageData.width,
-        originalImageData.height
-      );
-
-    processedImageData = changeRGB(processedImageData);
-
-    if (filterIntensity.grayscale > 0) 
-        processedImageData = changeGrayscale(processedImageData);
-    
-    if (filterIntensity.brightness > 0) 
-        processedImageData = changeBrightness(processedImageData);
-    
-    if (filterIntensity.threshold > 0) 
-        processedImageData = changeThreshold(processedImageData);
-    
-    if(filterIntensity.boxBlurRadius > 0)
-        processedImageData = boxBlur(processedImageData);
-
-    if(filterIntensity.gaussBlurRadius > 0)
-        processedImageData = gaussianBlur(processedImageData);
-
-    if(filterIntensity.sobel == 1)
-        processedImageData = sobelFilter(processedImageData);
-
-    if(filterIntensity.laplacian == 1)
-        processedImageData = laplacianFilter(processedImageData);
-
-    context.putImageData(processedImageData, 0, 0);
-}
-
-function resetFilters(){
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    context.drawImage(originalImage, 0, 0 , canvas.width, canvas.height);
-
-    document.getElementById('brightness-slider').value = 0;
-    document.getElementById('grayscale-slider').value = 0;
-    document.getElementById('threshold-slider').value = 0;
-    document.getElementById('boxblur-slider').value = 0;
-    document.getElementById('gauss-slider').value = 0;
-    document.getElementById('red-slider').value = 100;
-    document.getElementById('green-slider').value = 100;
-    document.getElementById('blue-slider').value = 100;
-
-    filterIntensity.brightness = 0;
-    filterIntensity.grayscale = 0;
-    filterIntensity.threshold = 0;
-    filterIntensity.boxBlurRadius = 0;
-    filterIntensity.red = 1;
-    filterIntensity.green = 1;
-    filterIntensity.blue = 1;
-    filterIntensity.sobel = 0;
-    filterIntensity.laplacian;
-
-    applyFilters();
-}
-
-function saveImage(){
-    let link =  document.createElement('a');
-    link.download = 'krejzi_image.png';
-    link.href = document.getElementById('editor-canvas').toDataURL();
-    link.click();
-}
-
-document.getElementById('grayscale-slider').addEventListener('input', (e) => {
-    filterIntensity.grayscale = e.target.value / 100;
-    applyFilters();
-});
-  
-document.getElementById('brightness-slider').addEventListener('input', (e) => {
-    filterIntensity.brightness = parseInt(e.target.value);
-    applyFilters();
-});
-  
-document.getElementById('threshold-slider').addEventListener('input', (e) => {
-    filterIntensity.threshold = parseInt(e.target.value);
-    applyFilters();
-});
-
-document.getElementById('boxblur-slider').addEventListener('input', (e) => {
-    filterIntensity.boxBlurRadius = parseInt(e.target.value);
-    applyFilters();
-});
-
-document.getElementById('gauss-slider').addEventListener('input', (e) => {
-    filterIntensity.gaussBlurRadius = parseInt(e.target.value);
-    applyFilters();
-});
-
-document.getElementById('red-slider').addEventListener('input', (e) => {
-    filterIntensity.red = parseInt(e.target.value) / 100;
-    applyFilters();
-});
-
-document.getElementById('green-slider').addEventListener('input', (e) => {
-    filterIntensity.green = parseInt(e.target.value) / 100;
-    applyFilters();
-});
-
-document.getElementById('blue-slider').addEventListener('input', (e) => {
-    filterIntensity.blue = parseInt(e.target.value) / 100;
-    applyFilters();
-});
-
-document.getElementById('sobel-operator').addEventListener('click',() => {
-    if(filterIntensity.sobel == 0)
-        filterIntensity.sobel = 1;
-    else filterIntensity.sobel = 0;
-    applyFilters();
-});
-
-document.getElementById('laplacian-operator').addEventListener('click',() => {
-    if(filterIntensity.laplacian == 0)
-        filterIntensity.laplacian = 1;
-    else filterIntensity.laplacian = 0;
-    applyFilters();
-});
-
-/********** 
- * FILTER FUNCTIONS
- * ***********/
 
 function changeBrightness(imageData){
     const src = imageData.data;
@@ -425,8 +229,8 @@ function sobelFilter(imageData) {
 
     for (let y = 1; y < height - 1; y++) {
         for (let x = 1; x < width - 1; x++) {
-            let GxSum = 0;
-            let GySum = 0;
+            let GxSumR = 0, GxSumG = 0, GxSumB = 0;
+            let GySumR = 0, GySumG = 0, GySumB = 0;
 
             for (let ky = -1; ky <= 1; ky++) {
                 for (let kx = -1; kx <= 1; kx++) {
@@ -434,27 +238,30 @@ function sobelFilter(imageData) {
                     let neighborY = y + ky;
                     let index = (neighborY * width + neighborX) * 4;
 
-                    let red = src[index];
-                    let green = src[index + 1];
-                    let blue = src[index + 2];
+                    GxSumR += src[index] * Gx[ky + 1][kx + 1];
+                    GxSumG += src[index + 1] * Gx[ky + 1][kx + 1];
+                    GxSumB += src[index + 2] * Gx[ky + 1][kx + 1];
 
-                    let pixelValue = 0.299 * red + 0.587 * green + 0.114 * blue;
-
-                    GxSum += pixelValue * Gx[ky + 1][kx + 1];
-                    GySum += pixelValue * Gy[ky + 1][kx + 1];
+                    GySumR += src[index] * Gy[ky + 1][kx + 1];
+                    GySumG += src[index + 1] * Gy[ky + 1][kx + 1];
+                    GySumB += src[index + 2] * Gy[ky + 1][kx + 1];
                 }
             }
 
-            let magnitude = Math.sqrt(GxSum * GxSum + GySum * GySum);
-            let normalizedMagnitude = (magnitude / maxMagnitude) * 255;
-            normalizedMagnitude = Math.min(255, Math.max(0, normalizedMagnitude));
+            let magnitudeR = Math.sqrt(GxSumR * GxSumR + GySumR * GySumR);
+            let magnitudeG = Math.sqrt(GxSumG * GxSumG + GySumG * GySumG);
+            let magnitudeB = Math.sqrt(GxSumB * GxSumB + GySumB * GySumB);
+
+            let normalizedR = Math.min(255, Math.max(0, (magnitudeR / maxMagnitude) * 255));
+            let normalizedG = Math.min(255, Math.max(0, (magnitudeG / maxMagnitude) * 255));
+            let normalizedB = Math.min(255, Math.max(0, (magnitudeB / maxMagnitude) * 255));
 
             const outputIndex = (y * width + x) * 4;
 
-            output[outputIndex] = normalizedMagnitude;
-            output[outputIndex + 1] = normalizedMagnitude;
-            output[outputIndex + 2] = normalizedMagnitude;
-            output[outputIndex + 3] = 255;
+            output[outputIndex] = normalizedR;
+            output[outputIndex + 1] = normalizedG;
+            output[outputIndex + 2] = normalizedB;
+            output[outputIndex + 3] = src[outputIndex + 3];
         }
     }
 
@@ -468,16 +275,16 @@ function laplacianFilter(imageData){
     let output = new Uint8ClampedArray(src.length);
 
     const kernel = [
-        [0, -1, 0],
-        [-1, 4, -1],
-        [0, -1, 0]
+        [1, 1, 1],
+        [1, -8, 1],
+        [1, 1, 1]
     ];
 
     const maxMagnitude = 1020;
 
     for (let y = 1; y < height - 1; y++) {
         for (let x = 1; x < width - 1; x++) {
-            let sum = 0;
+            let sumR = 0, sumG = 0, sumB = 0;
 
             for (let ky = -1; ky <= 1; ky++) {
                 for (let kx = -1; kx <= 1; kx++) {
@@ -485,25 +292,17 @@ function laplacianFilter(imageData){
                     let neighborY = y + ky;
                     let index = (neighborY * width + neighborX) * 4;
                     
-                    let red = src[index];
-                    let green = src[index + 1];
-                    let blue = src[index + 2];
-
-                    let pixelValue = 0.299 * red + 0.587 * green + 0.114 * blue;
-
-                    sum += kernel[kx + 1][ky + 1] * pixelValue;
+                    sumR += kernel[ky + 1][kx + 1] * src[index];
+                    sumG += kernel[ky + 1][kx + 1] * src[index + 1];
+                    sumB += kernel[ky + 1][kx + 1] * src[index + 2];
                 }
             }
-            let magnitude = Math.abs(sum);
-            let normalizedMagnitude = (magnitude / maxMagnitude) * 255;
-            normalizedMagnitude = Math.min(255, Math.max(0, normalizedMagnitude));
-
             const outputIndex = (y * width + x) * 4;
-
-            output[outputIndex] = normalizedMagnitude; // Red channel
-            output[outputIndex + 1] = normalizedMagnitude; // Green channel
-            output[outputIndex + 2] = normalizedMagnitude; // Blue channel
-            output[outputIndex + 3] = 255; // Alpha channel
+            output[outputIndex] = Math.min(255, Math.max(0, (Math.abs(sumR) / maxMagnitude) * 255));
+            output[outputIndex + 1] = Math.min(255, Math.max(0, (Math.abs(sumG) / maxMagnitude) * 255));
+            output[outputIndex + 2] = Math.min(255, Math.max(0, (Math.abs(sumB) / maxMagnitude) * 255));
+            output[outputIndex + 3] = src[outputIndex + 3];
+            
         }
     }
     
@@ -511,17 +310,42 @@ function laplacianFilter(imageData){
 
 }
 
-function unsharpMask(imageData){
+function sharpening(imageData){
+    const width = imageData.width;
+    const height = imageData.height;
+    const src = imageData.data;
+    const intensity = filterIntensity.sharpen;
 
-}
+    const laplacianData = laplacianFilter(imageData).data;
 
-function undo() {
-    if (archive.length > 0) {
-        context.putImageData(archive.pop(), 0, 0);
-    } else {
-        alert('No more undos available!');
+
+    for (let i = 0; i < src.length; i += 4) {
+        src[i] -= intensity*laplacianData[i];
+        src[i + 1] -= intensity*laplacianData[i + 1];
+        src[i + 2] -= intensity*laplacianData[i + 2];
+        src[i + 3] = laplacianData[i+3];
     }
+
+    return imageData;
 }
-function saveImageToArchive() {
-    archive.push(context.getImageData(0, 0, canvas.width, canvas.height));
+
+function unsharpening(imageData) {
+    const width = imageData.width;
+    const height = imageData.height;
+    const src = imageData.data;
+    let copy = new ImageData(src,width,height);
+    const intensity = filterIntensity.unsharpen / 100;
+
+    copy = gaussianBlur(copy).data;
+
+    for (let i = 0; i < src.length; i += 4) {
+        copy[i] = src[i] - copy[i];
+		src[i] += copy[i]*intensity;
+		copy[i + 1] = src[i + 1] - copy[i + 1];
+		src[i + 1] += copy[i + 1]*intensity;
+		copy[i + 2] = src[i + 2] - copy[i + 2];
+		src[i + 2] += copy[i + 2]*intensity;
+    }
+
+    return imageData;
 }

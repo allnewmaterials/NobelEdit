@@ -26,7 +26,7 @@
                         <h3>Brush</h3>
                         <div class="tool-option">
                             <label for="brush-size">Brush Size</label>
-                            <input type="range" id="brush-size" min="1" max="50" value="5">
+                            <input type="range" id="brush-size" min="0" max="50" value="5">
                         </div>
                         <div class="tool-option">
                             <label for="brush-color">Brush Color</label>
@@ -37,6 +37,8 @@
                 </div>
                 <div class="canvas-container">
                     <canvas id="editor-canvas" width="600" height="400"></canvas>
+                    <canvas id="histogram-canvas" width="600" height="200"></canvas>
+                    
                 </div>
                 <div class="right-panel">
                     <div class="tool-section">
@@ -47,11 +49,11 @@
                         </div>
                         <div class="filter-option">
                             <label for="brightness-slider">Brightness</label>
-                            <input type="range" id="brightness-slider" min="1" max="100" value="0">
+                            <input type="range" id="brightness-slider" min="0" max="100" value="50  ">
                         </div>
                         <div class="filter-option">
                             <label for="treshold-slider">Treshold</label>
-                            <input type="range" id="threshold-slider" min="0" max="100" value="0">
+                            <input type="range" id="threshold-slider" min="0" max="255" value="128">
                         <div class="filter-option">
                             <label for="boxblur-slider">BoxBlur</label>
                             <input type="range" id="boxblur-slider" min="0" max="25" value="0">
@@ -65,6 +67,14 @@
                         </div>
                         <div class="filter-option">
                             <button id="laplacian-operator">Lapacian operator</button>
+                        </div>
+                        <div class="filter-option">
+                            <label for="sharpening-slider">Sharpening</label>
+                            <input type="range" id="sharpening-slider" min="0" max="100" value="0">
+                        </div>
+                        <div class="filter-option">
+                            <label for="unsharpening-slider">Unsharpening</label>
+                            <input type="range" id="unsharpening-slider" min="0" max="500" value="0">
                         </div>
                     </div>
                     <div class="tool-section">
@@ -87,5 +97,9 @@
             </div>
         </div>
     </body>
+    <script src="main.js"></script>
+    <script src="interface.js"></script>
     <script src="functions.js"></script>
+    <script src="chart.min.js"></script>
+    <script src="histogram.js"></script>
 </html>

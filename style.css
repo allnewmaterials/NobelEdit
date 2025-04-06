@@ -97,10 +97,11 @@ button:hover {
 }
 
 .canvas-container {
-    flex-grow: 1;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 10px;
     padding: 20px;
     background-color: #e9e9e9;
 }
