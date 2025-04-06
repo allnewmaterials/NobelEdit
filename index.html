@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Photoschlop</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        
+        <div class="editor-container">
+            <h1 class="title">Photoschlop</h1>
+            <div class="editor-content">
+                <div class="tool-panel">
+                    <div class="tool-section">
+                        <h3>Brush</h3>
+                        <div class="tool-option">
+                            <label for="brush-size">Brush Size</label>
+                            <input type="range" id="brush-size" min="1" max="50" value="5">
+                        </div>
+                        <div class="tool-option">
+                            <label for="brush-color">Brush Color</label>
+                            <input type="color" id="brush-color" value="#000000">
+                        </div>
+                    </div>
+                    
+                    <div class="tool-section">
+                        <h3>Image</h3>
+                        <div class="tool-option">
+                            <label for="image-upload">Upload Image</label>
+                            <input type="file" id="image-upload" accept="image/*" onchange="uploadImage(event)">
+                        </div>
+                        <button id="save-image" onclick="saveImage()">Save Image</button>
+                        <button id="reset-filters" onclick="resetFilters()">Reset Filters</button>
+                    </div>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="editor-canvas" width="600" height="400"></canvas>
+                </div>
+                <div class="right-panel">
+                    <div class="tool-section">
+                        <h3>Filters</h3>
+                        <div class="filter-option">
+                            <label for="grayscale-slider">Grayscale</label>
+                            <input type="range" id="grayscale-slider" min="0" max="100" value="0">
+                        </div>
+                        <div class="filter-option">
+                            <label for="brightness-slider">Brightness</label>
+                            <input type="range" id="brightness-slider" min="1" max="100" value="0">
+                        </div>
+                        <div class="filter-option">
+                            <label for="treshold-slider">Treshold</label>
+                            <input type="range" id="threshold-slider" min="0" max="100" value="0">
+                        <div class="filter-option">
+                            <label for="boxblur-slider">BoxBlur</label>
+                            <input type="range" id="boxblur-slider" min="0" max="25" value="0">
+                        </div>
+                        <div class="filter-option">
+                            <label for="gauss-slider">Gaussian Blur</label>
+                            <input type="range" id="gauss-slider" min="0" max="25" value="0">
+                        </div>
+                        <div class="filter-option">
+                            <button id="sobel-operator">Sobel operator</button>
+                        </div>
+                    </div>
+                    <div class="tool-section">
+                        <h3>Color channels</h3>
+                        <div class="filter-option">
+                            <label for="red-slider">Red</label>
+                            <input type="range" id="red-slider" min="0" max="100" value="100">
+                        </div>
+                        <div class="filter-option">
+                            <label for="green-slider">Green</label>
+                            <input type="range" id="green-slider" min="0" max="100" value="100">
+                        </div>
+                        <div class="filter-option">
+                            <label for="blue-slider">Blue</label>
+                            <input type="range" id="blue-slider" min="0" max="100" value="100">
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script src="functions.js"></script>
+</html>

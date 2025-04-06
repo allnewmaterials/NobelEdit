@@ -1,0 +1,146 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+}
+
+.editor-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    overflow: hidden;
+}
+
+.title {
+    text-align: center;
+    padding: 20px;
+    background-color: var(--blueish);
+    color: white;
+    font-size: 2rem;
+}
+
+.editor-content {
+    display: flex;
+    min-height: 600px;
+}
+
+.tool-panel {
+    width: 250px;
+    padding: 20px;
+    background-color: #f0f0f0;
+}
+
+.tool-section {
+    margin-bottom: 25px;
+}
+
+.tool-section h3 {
+    margin-bottom: 15px;
+    color: #333;
+    border-bottom: 1px solid #ccc;
+    
+}
+
+.tool-option {
+    margin-bottom: 10px;
+}
+
+.tool-option label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.tool-option input, .tool-option select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+button {
+    background-color: var(--blueish);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    width: 100%;
+}
+
+button:hover {
+    background-color: var(--dark-magenta);
+}
+
+#save-image{
+    background-color: green;
+}
+
+#save-image:hover{
+    background-color: #195905;
+}
+#reset-filters:hover{
+    background-color: #8b0000;
+}
+
+#reset-filters{
+    background-color: red;
+}
+
+.canvas-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: #e9e9e9;
+}
+
+#editor-canvas {
+    max-width: 100%;
+    max-height: 80vh;
+    background-color: white;
+}
+
+#editor-canvas:hover{
+    cursor: crosshair;
+}
+
+.right-panel {
+    width: 250px;
+    padding: 20px;
+    background-color: #f0f0f0;
+}
+
+.filter-option {
+    margin-bottom: 10px;
+}
+
+.filter-option button {
+    margin-bottom: 5px;
+}
+
+.filter-option label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+:root{
+    --dark-magenta: #793862;
+    --blueish: #6773ad;
+}
+
+#source-image{
+    display: hidden;
+}
