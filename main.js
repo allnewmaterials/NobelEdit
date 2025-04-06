@@ -8,10 +8,6 @@ let brightnessSlider = document.getElementById('brightness-slider');
 let grayscaleSlider = document.getElementById('grayscale-slider');
 let thresholdSlider = document.getElementById('treshold-slider');
 
-let mouseX = 0;
-let mouseY = 0;
-let mouseDown = false;
-
 let filterIntensity ={
     grayscale: 0,
     brightness: 0,
@@ -25,7 +21,7 @@ let filterIntensity ={
     laplacian: 0,
     sharpen: 0,
     unsharpen: 0,
-    brushSize: 0
+    brushSize: 5
 };
 
 let archive = [];
@@ -68,8 +64,8 @@ function uploadImage(event) {
         originalImage = img;
         
         URL.revokeObjectURL(img.src);
+        applyFilters();
     };
-    applyFilters();
 };
 
 function applyFilters(){
@@ -108,13 +104,11 @@ function applyFilters(){
     if(filterIntensity.unsharpen > 0)
         processedImageData = unsharpening(processedImageData);
 
-    if(filterIntensity.brushSize > 0 && mouseDown == true){
-        processedImageData = drawBrush(processedImageData);
-    }
     
-    updateChart();
-
+    saveImageToArchive()
+    
     context.putImageData(processedImageData, 0, 0);
+    updateChart();
 }
 
 function resetFilters(){
@@ -131,10 +125,11 @@ function resetFilters(){
     document.getElementById('blue-slider').value = 100;
     document.getElementById('sharpening-slider').value = 0;
     document.getElementById('unsharpening-slider').value = 0;
+    document.getElementById('brush-size').value = 0;
 
     filterIntensity.brightness = 0;
     filterIntensity.grayscale = 0;
-    filterIntensity.threshold = 128;
+    filterIntensity.threshold = 0;
     filterIntensity.boxBlurRadius = 0;
     filterIntensity.red = 1;
     filterIntensity.green = 1;

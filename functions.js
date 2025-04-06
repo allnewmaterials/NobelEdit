@@ -208,7 +208,7 @@ function changeRGB(imageData){
     return imageData;
 }
 
-function sobelFilter(imageData) {
+function sobelFilter(imageData) {//??
     const width = imageData.width;
     const height = imageData.height;
     const src = imageData.data;
@@ -268,7 +268,7 @@ function sobelFilter(imageData) {
     return new ImageData(output, width, height);
 }
 
-function laplacianFilter(imageData){
+function laplacianFilter(imageData){//???
     const width = imageData.width;
     const height = imageData.height;
     const src = imageData.data;
@@ -333,18 +333,18 @@ function unsharpening(imageData) {
     const width = imageData.width;
     const height = imageData.height;
     const src = imageData.data;
-    let copy = new ImageData(src,width,height);
+    let blurredSrc = new ImageData(src,width,height);
     const intensity = filterIntensity.unsharpen / 100;
 
-    copy = gaussianBlur(copy).data;
+    blurredSrc = gaussianBlur(blurredSrc).data;
 
     for (let i = 0; i < src.length; i += 4) {
-        copy[i] = src[i] - copy[i];
-		src[i] += copy[i]*intensity;
-		copy[i + 1] = src[i + 1] - copy[i + 1];
-		src[i + 1] += copy[i + 1]*intensity;
-		copy[i + 2] = src[i + 2] - copy[i + 2];
-		src[i + 2] += copy[i + 2]*intensity;
+        blurredSrc[i] = src[i] - blurredSrc[i];
+		src[i] += blurredSrc[i]*intensity;
+		blurredSrc[i + 1] = src[i + 1] - blurredSrc[i + 1];
+		src[i + 1] += blurredSrc[i + 1]*intensity;
+		blurredSrc[i + 2] = src[i + 2] - blurredSrc[i + 2];
+		src[i + 2] += blurredSrc[i + 2]*intensity;
     }
 
     return imageData;

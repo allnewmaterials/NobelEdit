@@ -16,10 +16,12 @@
                     <div class="tool-section">
                         <div class="tool-section">
                             <h3>Image</h3>
+                            
                             <div class="tool-option">
                                 <label for="image-upload">Upload Image</label>
                                 <input type="file" id="image-upload" accept="image/*" onchange="uploadImage(event)">
                             </div>
+                            <button id="undo-change" onclick="undo()">Undo change</button>
                             <button id="save-image" onclick="saveImage()">Save Image</button>
                             <button id="reset-filters" onclick="resetFilters()">Reset Filters</button>
                         </div>
@@ -32,6 +34,7 @@
                             <label for="brush-color">Brush Color</label>
                             <input type="color" id="brush-color" value="#000000">
                         </div>
+
                     </div>
                     
                 </div>
@@ -49,11 +52,11 @@
                         </div>
                         <div class="filter-option">
                             <label for="brightness-slider">Brightness</label>
-                            <input type="range" id="brightness-slider" min="0" max="100" value="50  ">
+                            <input type="range" id="brightness-slider" min="0" max="100" value="0">
                         </div>
                         <div class="filter-option">
                             <label for="treshold-slider">Treshold</label>
-                            <input type="range" id="threshold-slider" min="0" max="255" value="128">
+                            <input type="range" id="threshold-slider" min="0" max="255" value="0">
                         <div class="filter-option">
                             <label for="boxblur-slider">BoxBlur</label>
                             <input type="range" id="boxblur-slider" min="0" max="25" value="0">

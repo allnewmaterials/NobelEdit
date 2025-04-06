@@ -91,10 +91,11 @@ canvas.addEventListener('mouseup', () => {
     mouseDown = false;
 });
 
-function drawBall(x, y, brushSize, brushColor) {
+function drawBall(x, y, brushWidth, brushColor) {
     context.beginPath();
-    context.arc(x, y, brushSize, 0, Math.PI * 2);
+    context.arc(x, y, brushWidth, 0, Math.PI * 2);
     context.fillStyle = brushColor;
     context.fill();
     context.closePath();
+    saveImageToArchive();
 }
